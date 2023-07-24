@@ -1,0 +1,26 @@
+{
+  "name": "contract",
+  "version": "1.0.0",
+  "description": "openbuild-test-contract",
+  "main": "index.js",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat run scripts/deploy.js --network sepolia"
+  },
+  "author": "",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openbuildxyz/openbuild-loyalty.git"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "hardhat": "^2.15.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.2",
+    "dotenv": "^16.3.1",
+    "eth-crypto": "^2.6.0",
+    "ethers": "^6.6.2"
+  }
+}
