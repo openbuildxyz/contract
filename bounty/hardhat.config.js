@@ -40,6 +40,13 @@ module.exports = {
         mnemonic: mnemonic,
       }
     },
+    bsc: {
+      url: "https://bsc.blockpi.network/v1/rpc/public",
+      chainId: 56,
+      accounts: {
+          mnemonic: mnemonic,
+      }
+    },
     mumbai: {
       url: 'https://rpc-mumbai.maticvigil.com',
       gasPrice: 30000000000,

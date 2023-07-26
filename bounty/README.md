@@ -1,6 +1,8 @@
 # Task 合约
 
 已部署到 Arbitrum Goerli 测试网合约地址: 0x0Be5C62Ad82222b5dB88BF87D8Bc3C7B46fe04d8
+TEST BSC 部署在: 0xf7F9708434CcAc50627Cecb8a896e409f19Cd6d6
+BSC 部署在: 0xf7F9708434CcAc50627Cecb8a896e409f19Cd6d6
 
 主要方法：
 
