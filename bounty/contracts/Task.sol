@@ -45,9 +45,9 @@ contract Task is Verifier, Ownable, ITask {
         if (worker == address(0)) revert InvalidAddress();
         if (tasks[taskId].worker != address(0)) revert AlreadyExists();
 
-        IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
+        IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
 
-        tasks[_taskId] = TaskInfo({
+        tasks[taskId] = TaskInfo({
             issuer: msg.sender,
             worker: worker,
             token: token,
