@@ -150,6 +150,12 @@
       {
         "indexed": false,
         "internalType": "address",
+        "name": "issuer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
         "name": "worker",
         "type": "address"
       },
@@ -263,22 +269,22 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_taskId",
+        "name": "taskId",
         "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "_worker",
+        "name": "worker",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_token",
+        "name": "token",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "_amount",
+        "name": "amount",
         "type": "uint256"
       }
     ],
