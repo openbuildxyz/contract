@@ -21,7 +21,6 @@ contract Task is Verifier, Ownable, ITask {
 
     mapping(address => bool) public managers;
     mapping(uint256 => TaskInfo) public tasks;
-    uint private _totalSupply;
 
     event TaskCreated(uint taskId, address worker, address token, uint amount);
     event Withdrew(uint taskId, address to, address token, uint amount);
