@@ -22,7 +22,13 @@ contract Task is Verifier, Ownable, ITask {
     mapping(address => bool) public managers;
     mapping(uint256 => TaskInfo) public tasks;
 
-    event TaskCreated(uint taskId, address worker, address token, uint amount);
+    event TaskCreated(
+        uint taskId,
+        address issuer,
+        address worker,
+        address token,
+        uint amount
+    );
     event Withdrew(uint taskId, address to, address token, uint amount);
     event Refunded(uint taskId, address to, address token, uint amount);
     event SetManager(address manager, bool enabled);
@@ -31,24 +37,24 @@ contract Task is Verifier, Ownable, ITask {
     constructor() {}
 
     function createTask(
-        uint _taskId,
-        address _worker,
-        address _token,
-        uint _amount
+        uint taskId,
+        address worker,
+        address token,
+        uint amount
     ) external override {
-        if (_worker == address(0)) revert InvalidAddress();
-        if (tasks[_taskId].worker != address(0)) revert AlreadyExists();
-        
+        if (worker == address(0)) revert InvalidAddress();
+        if (tasks[taskId].worker != address(0)) revert AlreadyExists();
+
         IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
 
         tasks[_taskId] = TaskInfo({
             issuer: msg.sender,
-            worker: _worker,
-            token: _token,
-            amount: _amount,
+            worker: worker,
+            token: token,
+            amount: amount,
             withdrawn: false
         });
-        emit TaskCreated(_taskId, _worker, _token, _amount);
+        emit TaskCreated(taskId, msg.sender, worker, token, amount);
     }
 
     function withdraw(
