@@ -14,7 +14,7 @@ const contractInterface = contract.abi;
 // const signer = new ethers.Wallet(privateKey, provider)
 
 // const nftInstance = new ethers.Contract(
-//     process.env.CONTRACT_ADDRESS,
+//     process.env.ARB_GOERLI_CONTRACT_ADDRESS,
 //     contractInterface,
 //     signer
 // );
@@ -28,20 +28,26 @@ const provider = new ethers.InfuraProvider(
 const signer = new ethers.Wallet(process.env.SEPOLIA_PVK, provider);
 
 const nftInstance = new ethers.Contract(
-    process.env.CONTRACT_ADDRESS,
+    process.env.SEPOLIA_CONTRACT_ADDRESS,
     contractInterface,
     signer
 );
 
 // constract mint parameters
 const msg_signer_privKey = process.env.MSG_SIGNER_PRIVATE_KEY;
-const msg_signer_pubKey = EthCrypto.publicKeyByPrivateKey(msg_signer_privKey);
-const msg_signer_address = EthCrypto.publicKey.toAddress(msg_signer_pubKey);
+// const msg_signer_pubKey = EthCrypto.publicKeyByPrivateKey(msg_signer_privKey);
+// const msg_signer_address = EthCrypto.publicKey.toAddress(msg_signer_pubKey);
 
-const messageHash = EthCrypto.hash.keccak256([
-    { type: "uint256", value: "25" },
-]);
-const signatureObj = EthCrypto.sign(msg_signer_privKey, messageHash);
+const messageHash = (nftid, userid, imgurl) => {
+    let message = String(nftid) + String(userid) + String(imgurl);
+    console.log(message);
+    return EthCrypto.hash.keccak256(message);
+}
+
+const signatureObj = (msg) => {
+    return EthCrypto.sign(msg_signer_privKey, msg);
+}
+
 
 const mint = async () => {
     console.log("Waiting for 5 blocks to confirm...");
@@ -50,11 +56,10 @@ const mint = async () => {
     let nftId = 111;
     let userId = 222;
     let imgUrl = "https://www.example.com";
-    let message = messageHash;
-    let signature = signatureObj;
-    let msgSigner = msg_signer_address;
+    let message = messageHash(nftId, userId, imgUrl);
+    let signature = signatureObj(message);
 
-    let mintTx = await nftInstance.safeMint(to, nftId, userId, imgUrl, message, signature, msgSigner)
+    let mintTx = await nftInstance.safeMint(to, nftId, userId, imgUrl, message, signature)
     await mintTx.wait()
     console.log(`Your tx address: ${mintTx.hash}`)
 };
