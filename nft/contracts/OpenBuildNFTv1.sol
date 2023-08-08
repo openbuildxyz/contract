@@ -37,6 +37,8 @@ contract OpenBuildNFTv1 is ERC721, ERC721URIStorage, Ownable {
     }
 
     event Mint(address indexed to, uint256 indexed tokenId);
+    event baseUriChanged(string newBaseURI);
+    event msgSignerChanged(address newMsgSigner);
 
     constructor() ERC721(_nftName, _nftSymbol) {}
 
@@ -46,6 +48,7 @@ contract OpenBuildNFTv1 is ERC721, ERC721URIStorage, Ownable {
 
     function setBaseURI(string calldata newBaseTokenURI) external onlyOwner {
         _baseTokenURI = newBaseTokenURI;
+        emit baseUriChanged(newBaseTokenURI);
     }
 
     function _getMsgSigner() internal view returns (address) {
@@ -53,7 +56,9 @@ contract OpenBuildNFTv1 is ERC721, ERC721URIStorage, Ownable {
     }
 
     function setMsgSigner(address newMsgSigner) external onlyOwner {
+        require(address(newMsgSigner) != address(0), "Address of MsgSigner Cannot be Zero.");
         _msgSigner = newMsgSigner;
+        emit msgSignerChanged(newMsgSigner);
     }
 
     function getTokenCounter() public view returns (uint256) {
@@ -88,6 +93,10 @@ contract OpenBuildNFTv1 is ERC721, ERC721URIStorage, Ownable {
         return ECDSA.recover(_hash, _signature) == _msgSigner;
     }
 
+    function validateMessage(uint256 nftId, uint256 userId, string memory imgUrl, bytes32 message) public pure returns (bool) {
+        return keccak256(bytes(string.concat(Strings.toString(nftId), Strings.toString(userId), imgUrl))) == message;
+    }
+
     function safeMint(
         address to,
         uint256 nftId,
@@ -96,16 +105,18 @@ contract OpenBuildNFTv1 is ERC721, ERC721URIStorage, Ownable {
         bytes32 message,
         bytes memory signature
     ) public nonReentrant {
+        require(tokenIdToCounter[nftId] == 0, "Token already minted");
         require(validateSignature(message, signature), "Signature validation failed");
+        require(validateMessage(nftId, userId, imgUrl, message), "Message validation failed");
 
+        // token counter start from one
+        _tokenCounter.increment();
         uint256 _counter = _tokenCounter.current();
+
         counterToUserId[_counter] = userId;
         counterToTokenId[_counter] = nftId;
         tokenIdToCounter[nftId] = _counter;
         tokenIdToImgUrl[nftId] = imgUrl;
-
-        // token counter start from zero
-        _tokenCounter.increment();
 
         _safeMint(to, _counter);
         _setTokenURI(_counter, Strings.toString(nftId));
@@ -114,6 +125,10 @@ contract OpenBuildNFTv1 is ERC721, ERC721URIStorage, Ownable {
     function _burn(
         uint256 tokenId
     ) internal override(ERC721, ERC721URIStorage) onlyOwner {
+        delete counterToUserId[tokenIdToCounter[tokenId]];
+        delete counterToTokenId[tokenIdToCounter[tokenId]];
+        delete tokenIdToImgUrl[tokenId];
+        delete tokenIdToCounter[tokenId];
         super._burn(tokenId);
     }
 
