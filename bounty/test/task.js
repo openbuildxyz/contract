@@ -42,7 +42,7 @@ describe("Task", () => {
 
       await expect(
         task.connect(issuer).createTask(taskID, worker.address, mockUSDT.address, amount)
-      ).emit(task, 'TaskCreated').withArgs(1, worker.address, mockUSDT.address, amount);
+      ).emit(task, 'TaskCreated').withArgs(1, issuer.address, worker.address, mockUSDT.address, amount);
 
       const balanceAfter = await mockUSDT.balanceOf(issuer.address);
 
@@ -364,40 +364,39 @@ describe("Task", () => {
   });
 
   describe('arbitrate', () => {
-    it.only("arbitrate should succeed", async () => {
+    it("arbitrate should succeed", async () => {
       let { chainId } = await ethers.provider.getNetwork();
       let amount = 1000;
       let toAmount = 300;
       let sigAmount = 200;
       let deadline = "1689035633" // expired
-      let taskId = 10110;
+      let taskId = 1;
       const balanceBeforeIssuer = await mockUSDT.balanceOf(issuer.address);
       const balanceBeforeWorker = await mockUSDT.balanceOf(worker.address);
       const balanceBeforeContract = await mockUSDT.balanceOf(task.address);
 
-      // await mockUSDT.connect(issuer).approve(task.address, ethers.constants.MaxUint256);
-      // await task.connect(issuer).createTask(taskId, worker.address, mockUSDT.address, amount);
+      await mockUSDT.connect(issuer).approve(task.address, ethers.constants.MaxUint256);
+      await task.connect(issuer).createTask(taskId, worker.address, mockUSDT.address, amount);
 
       const sig = await signWithdraw(
         chainId,
-        "0x6F6852B7C579Eccc46637d546628029C952aC1Dd",
-        owner,
+        task.address,
+        issuer,
         taskId,
         sigAmount,
         deadline,
       );
-      console.log(sig)
-      // await expect(
-      //   task.connect(manager).arbitrate(taskId, toAmount, sigAmount, deadline, sig)
-      // ).emit(task, 'Arbitrated').withArgs(taskId, mockUSDT.address, toAmount);
+      await expect(
+        task.connect(manager).arbitrate(taskId, toAmount, sigAmount, deadline, sig)
+      ).emit(task, 'Arbitrated').withArgs(taskId, mockUSDT.address, toAmount);
 
-      // const balanceAfterIssuer = await mockUSDT.balanceOf(issuer.address);
-      // const balanceAfterWorker = await mockUSDT.balanceOf(worker.address);
-      // const balanceAfterContract = await mockUSDT.balanceOf(task.address);
+      const balanceAfterIssuer = await mockUSDT.balanceOf(issuer.address);
+      const balanceAfterWorker = await mockUSDT.balanceOf(worker.address);
+      const balanceAfterContract = await mockUSDT.balanceOf(task.address);
 
-      // expect(balanceBeforeIssuer - balanceAfterIssuer).to.equal(toAmount);
-      // expect(balanceAfterWorker - balanceBeforeWorker).to.equal(toAmount);
-      // expect(balanceBeforeContract - balanceAfterContract).to.equal(0);
+      expect(balanceBeforeIssuer - balanceAfterIssuer).to.equal(toAmount);
+      expect(balanceAfterWorker - balanceBeforeWorker).to.equal(toAmount);
+      expect(balanceBeforeContract - balanceAfterContract).to.equal(0);
     });
 
     it("arbitrate zero should succeed", async () => {
