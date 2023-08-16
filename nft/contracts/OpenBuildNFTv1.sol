@@ -93,8 +93,8 @@ contract OpenBuildNFTv1 is ERC721, ERC721URIStorage, Ownable {
         return ECDSA.recover(_hash, _signature) == _msgSigner;
     }
 
-    function validateMessage(uint256 nftId, uint256 userId, string memory imgUrl, bytes32 message) public pure returns (bool) {
-        return keccak256(bytes(string.concat(Strings.toString(nftId), Strings.toString(userId), imgUrl))) == message;
+    function validateMessage(address to, uint256 nftId, uint256 userId, string memory imgUrl, bytes32 message) public pure returns (bool) {
+        return keccak256(bytes(string.concat(Strings.toHexString(to), Strings.toString(nftId), Strings.toString(userId), imgUrl))) == message;
     }
 
     function safeMint(
@@ -107,7 +107,7 @@ contract OpenBuildNFTv1 is ERC721, ERC721URIStorage, Ownable {
     ) public nonReentrant {
         require(tokenIdToCounter[nftId] == 0, "Token already minted");
         require(validateSignature(message, signature), "Signature validation failed");
-        require(validateMessage(nftId, userId, imgUrl, message), "Message validation failed");
+        require(validateMessage(to, nftId, userId, imgUrl, message), "Message validation failed");
 
         // token counter start from one
         _tokenCounter.increment();
@@ -128,8 +128,8 @@ contract OpenBuildNFTv1 is ERC721, ERC721URIStorage, Ownable {
         delete counterToUserId[tokenIdToCounter[tokenId]];
         delete counterToTokenId[tokenIdToCounter[tokenId]];
         delete tokenIdToImgUrl[tokenId];
-        delete tokenIdToCounter[tokenId];
-        super._burn(tokenId);
+        
+        super._burn(tokenIdToCounter[tokenId]);
     }
 
     // transfer disabled
