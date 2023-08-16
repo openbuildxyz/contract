@@ -38,9 +38,8 @@ const msg_signer_privKey = process.env.MSG_SIGNER_PRIVATE_KEY;
 // const msg_signer_pubKey = EthCrypto.publicKeyByPrivateKey(msg_signer_privKey);
 // const msg_signer_address = EthCrypto.publicKey.toAddress(msg_signer_pubKey);
 
-const messageHash = (nftid, userid, imgurl) => {
-    let message = String(nftid) + String(userid) + String(imgurl);
-    console.log(message);
+const messageHash = (to, nftid, userid, imgurl) => {
+    let message = String(to.toLowerCase()) + String(nftid) + String(userid) + String(imgurl);
     return EthCrypto.hash.keccak256(message);
 }
 
@@ -56,7 +55,7 @@ const mint = async () => {
     let nftId = 111;
     let userId = 222;
     let imgUrl = "https://www.example.com";
-    let message = messageHash(nftId, userId, imgUrl);
+    let message = messageHash(to, nftId, userId, imgUrl);
     let signature = signatureObj(message);
 
     let mintTx = await nftInstance.safeMint(to, nftId, userId, imgUrl, message, signature)
