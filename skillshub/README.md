@@ -12,6 +12,10 @@
 - SkillsHub: `0xDc03bB2dFCeFa9e9eCE7DC6459be8Ac688742582`
 - OpenBuildToken: `0x521FD468fBba8d929bf22F3031b693A499841E55`
 
+### BSC
+
+- SkillsHub: `0x87ee4e10c715Bb898f97695FF4a45b3147E81b90`
+
 ## Deploy
 
 ### copy .env.example to .env
