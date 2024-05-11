@@ -26,6 +26,13 @@ module.exports = {
         mnemonic
       },
     },
+    holesky: {
+      url: `https://rpc-holesky.rockx.com`,
+      accounts: {
+        mnemonic
+      },
+      chainId: 17000,
+    },
     bnb: {
       url: `https://rpc.ankr.com/bsc`,
       accounts: {
